@@ -1,6 +1,7 @@
 import React, {Component} from "react";
 import axios from 'axios';
 import { Buffer } from "buffer";
+import spotifyConfig from "./SpotifyConfig";
 import { getDatabase, ref, set, onValue } from "firebase/database";
 import { Card, CardBody, Container, Nav, NavItem,Row, Table, Button, ModalHeader, ModalBody, Label, Modal, Input, Form, ModalFooter, UncontrolledPopover, PopoverHeader, PopoverBody, Col, NavLink } from "reactstrap";
 
@@ -22,8 +23,9 @@ export default class Home extends Component {
             artistSearchResults: [],
         }
 
-        this.toggle = this.toggle.bind(this);
-        this.toggle2 = this.toggle2.bind(this);
+        //Bindings
+        this.toggleAddModal = this.toggleAddModal.bind(this);
+        this.toggleEditModal = this.toggleEditModal.bind(this);
         this.updateTempAlbum = this.updateTempAlbum.bind(this);
         this.updateTempArtist = this.updateTempArtist.bind(this);
         this.updateTempRating = this.updateTempRating.bind(this);
@@ -34,16 +36,6 @@ export default class Home extends Component {
         this.getArtistResults = this.getArtistResults.bind(this);
     }
 
-    writeRatingData(artist, album, rating, review, url,ratingId) {
-        const db = getDatabase();
-        set(ref(db, 'musicRatings/' + ratingId), {
-            artistName: artist,
-            albumName: album,
-            albumRating: rating,
-            albumReview: review,
-            albumArtURL: url,
-        });
-      }
 
     componentDidMount() {
         const db = getDatabase();
@@ -53,14 +45,14 @@ export default class Home extends Component {
             this.setState({
                 entries: data,
             });
-            this.updateList(data);
         });
         this.getAccessToken();
     }
 
+    /**
+     * Makes a post request to the Spotify API to get an access token string used for further API requests.
+     */
     getAccessToken() {
-        const clientId = 'c149d4214bc541c388548ecbfa1910e7';
-        const clientSecret = 'f556a7cface44607a151118d96ec9fd1';
 
         const serialize = function(obj) {
             var str = [];
@@ -71,14 +63,13 @@ export default class Home extends Component {
             }
             return str.join("&");
         }
-
-        
+      
         axios.post('https://accounts.spotify.com/api/token',
                 serialize({
                     grant_type: 'client_credentials'
                 }), {
                 headers: {
-                    'Authorization': 'Basic ' + (new Buffer.from(clientId + ':' + clientSecret).toString('base64')),
+                    'Authorization': 'Basic ' + (new Buffer.from(spotifyConfig.clientId + ':' + spotifyConfig.clientSecret).toString('base64')),
                 }
             })
             .then(response => this.setState({
@@ -89,6 +80,11 @@ export default class Home extends Component {
             });
     }
 
+    /**
+     * Retrieves a list of albums for a given artst using the Spotify API.
+     * @param {Number} id The numerical representation of the queried artist.
+     * @param {Function} callback Callback function that uses the response data as a parameter.
+     */
     getAlbum(id, callback) {
         axios.get(`https://api.spotify.com/v1/albums/${id}`, {
             headers: {
@@ -104,12 +100,10 @@ export default class Home extends Component {
             });
     }
 
-    updateList(data) {
-        this.setState({
-            list: data,
-        });
-    }
-
+    /**
+     * onChange function that updates the tempReview state.
+     * @param {HTMLInputElement} e Input object which its value is extracted.
+     */
     updateTempReview(e) {
         let review = e.target.value;
         this.setState({
@@ -117,30 +111,44 @@ export default class Home extends Component {
         });
     }
 
-    toggle2() {
+    /** 
+     * Used to change the state of the edit review modal from on and off.
+    */
+    toggleEditModal() {
         this.setState({
             editModalState: !this.state.editModalState,
         });
     }
       
-    toggle() {
+    /**
+     * Used to change the state of the add review modal from on and off.
+     */
+    toggleAddModal() {
         this.setState({
             addModalState: !this.state.addModalState,
             tempAlbum: "",
             tempArtist: "",
-            tempRating: null
+            tempRating: null,
+            artistSearchResults: []
         });
     }
 
+    /**
+     * onChange function used to update the tempArtist state.
+     * @param {HTMLInputElement} e Input object which its value is extracted.
+     */
     updateTempArtist(e) {
         let artistInit = e.target.value;
-        let artist = artistInit.replace(' ', '%20');
+        let artist = artistInit.replace(' ', '%20'); //Replaces spaces with URL encoding for spaces used in Spotify API call.
         console.log(artist)
         this.setState({
             tempArtist: artist,
         });
     }
 
+    /**
+     * Queries the spotify API for user inputed artist name.
+     */
     getArtistResults() {
         let artist = this.state.tempArtist;
         const token = this.state.accessToken;
@@ -160,8 +168,15 @@ export default class Home extends Component {
         });
     }
 
+    /**
+     * Queries the Spotify API for all of a certain artist's albums.
+     * @param {String} artist The string name of the artist for the query
+     */
     searchAlbums(artist) {
         const context = this;
+        let lookup = {};
+        let output = [];
+
         axios.get(`https://api.spotify.com/v1/artists/${artist.data.artists.items[0].id}/albums`,{ 
                 headers: {
                     'Authorization': 'Bearer ' + this.state.accessToken,
@@ -172,12 +187,20 @@ export default class Home extends Component {
                 let albums = [];
                 response.data.items.forEach(entry => {
                     if(entry.album_type === "album" && !response.data.items.includes(entry.name)) {
-                        
                         albums.push(entry);
                     }
                 });
+                //Filters out duplicate album names.
+                albums.forEach(item => {
+                    let name = item.name;
+                  
+                    if (!(name in lookup)) {
+                      lookup[name] = 1;
+                      output.push(item);
+                    }
+                });
                 context.setState({
-                    artistSearchResults: albums,
+                    artistSearchResults: output,
                 });
             })
             .catch(function (error) {
@@ -185,6 +208,10 @@ export default class Home extends Component {
             });
     }
 
+    /**
+     * onChange function used to update the tempAlbum state.
+     * @param {HTMLInputElement} e Input object which its value is extracted.
+     */
     updateTempAlbum(e) {       
         const albums = this.state.artistSearchResults;
         const index = e.target.selectedIndex;
@@ -196,13 +223,21 @@ export default class Home extends Component {
         });
     }
 
+    /**
+     * onChange function used to update the tempRating state.
+     * @param {HTMLInputElement} e Inout object which its value is extracted.
+     */
     updateTempRating(e) {
-        let rating = (e.target.value)/20;
+        let rating = (e.target.value)/20; //formats rating into a range of 0-5 rather than 0-100.
         this.setState({
             tempRating: rating,
         });
     }
 
+    /**
+     * Reads the artistSearchResult state and creates option elements with the names of each album in the results.
+     * @returns An array containing HTML option components.
+     */
     renderInput() {
         const results = this.state.artistSearchResults;
         let components = [];
@@ -215,19 +250,26 @@ export default class Home extends Component {
         return components;
     }
 
+    /**
+     * Writes the inputted user review into a new database entry.
+     */
     addEntry() {
-        let artist = this.state.tempArtist;
-        let album = this.state.tempAlbum;
-        let rating = this.state.tempRating;
-        let review = this.state.tempReview;
-        let list = this.state.entries;
-        let url = this.state.tempURL;
-        list.push({'artistName': artist, 'albumName':album, 'albumRating': rating});
+        const db = getDatabase();
+        set(ref(db, 'musicRatings/' + (this.state.entries.length)), {
+            artistName: this.state.tempArtist,
+            albumName: this.state.tempAlbum,
+            albumRating: this.state.tempRating,
+            albumReview: this.state.tempReview,
+            albumArtURL: this.state.tempURL,
+        });
 
-        this.writeRatingData(artist, album, rating, review, url,list.length-1);
-        this.toggle();
+        this.toggleAddModal();
     }
 
+    /**
+     * Iterates through the array of album reviews and creates table entries for each of them with all the embedded data.
+     * @returns An array of HTMLTableRow elements.
+     */
     parseEntries() {
         let list = this.state.entries;
         let componets = [];
@@ -266,6 +308,10 @@ export default class Home extends Component {
         return componets;
     }
 
+    /**
+     * Loads all the album reviews for selection in an Input Select.
+     * @returns An array of HTMLOption elements.
+     */
     loadOptions() {
         const albums = this.state.entries;
         let components = [];
@@ -290,7 +336,7 @@ export default class Home extends Component {
                     <Card>
                         <Nav tabs pills >
                             <NavItem>
-                                <NavLink onClick={this.toggle}>
+                                <NavLink onClick={this.toggleAddModal}>
                                     Add a Rating
                                 </NavLink>
                             </NavItem>
@@ -300,12 +346,12 @@ export default class Home extends Component {
                                 </NavLink>
                             </NavItem>
                             <NavItem>
-                                <NavLink onClick={this.toggle2}>
+                                <NavLink onClick={this.toggleEditModal}>
                                     Edit Rating
                                 </NavLink>
                             </NavItem>
                         </Nav>
-                        <Modal isOpen={this.state.editModalState} toggle={()=> this.toggle2}>
+                        <Modal isOpen={this.state.editModalState} toggle={()=> this.toggleEditModal}>
                             <ModalHeader>
                                 Edit a Review
                             </ModalHeader>
@@ -321,7 +367,7 @@ export default class Home extends Component {
                             </ModalBody>
                             <ModalFooter>
                                 <Button color="success">Submit</Button>
-                                <Button color='danger' onClick={this.toggle2}>Cancel</Button>
+                                <Button color='danger' onClick={this.toggleEditModal}>Cancel</Button>
                             </ModalFooter>
                         </Modal>
                         <CardBody>
@@ -339,7 +385,7 @@ export default class Home extends Component {
                                     {this.parseEntries()}
                                 </tbody>
                             </Table>
-                            <Modal isOpen={this.state.addModalState} centered size="lg" toggle={()=> this.toggle}>
+                            <Modal isOpen={this.state.addModalState} centered size="lg" toggle={()=> this.toggleAddModal}>
                                 <ModalHeader>
                                     Add a Rating
                                 </ModalHeader>
@@ -374,7 +420,7 @@ export default class Home extends Component {
                                 </ModalBody>
                                 <ModalFooter>
                                     <Button color="success" onClick={this.addEntry} >Submit</Button>
-                                    <Button onClick={this.toggle} color="danger" >Cancel</Button>
+                                    <Button onClick={this.toggleAddModal} color="danger" >Cancel</Button>
                                 </ModalFooter>
                             </Modal>
                         </CardBody>

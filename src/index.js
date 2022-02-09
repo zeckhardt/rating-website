@@ -9,8 +9,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 initializeApp(firebaseConfig);
 
 ReactDOM.render(
-  <React.StrictMode>
-    <Home />
-  </React.StrictMode>,
+    <Home />,
   document.getElementById('root')
 );

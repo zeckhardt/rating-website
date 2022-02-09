@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import axios from 'axios';
 import { Buffer } from "buffer";
 import spotifyConfig from "./SpotifyConfig";
-import { getDatabase, ref, set, onValue } from "firebase/database";
+import { getDatabase, ref, set, onValue, update } from "firebase/database";
 import { Card, CardBody, Container, Nav, NavItem,Row, Table, Button, ModalHeader, ModalBody, Label, Modal, Input, Form, ModalFooter, UncontrolledPopover, PopoverHeader, PopoverBody, Col, NavLink } from "reactstrap";
 
 
@@ -21,6 +21,7 @@ export default class Home extends Component {
             entries: [],
             accessToken: "",
             artistSearchResults: [],
+            editIndex: null,
         }
 
         //Bindings
@@ -34,6 +35,8 @@ export default class Home extends Component {
         this.getAccessToken = this.getAccessToken.bind(this);
         this.getAlbum = this.getAlbum.bind(this);
         this.getArtistResults = this.getArtistResults.bind(this);
+        this.makeEditSelection = this.makeEditSelection.bind(this);
+        this.updateReview = this.updateReview.bind(this);
     }
 
 
@@ -117,6 +120,8 @@ export default class Home extends Component {
     toggleEditModal() {
         this.setState({
             editModalState: !this.state.editModalState,
+            tempRating: null,
+            tempReview: ""
         });
     }
       
@@ -140,7 +145,6 @@ export default class Home extends Component {
     updateTempArtist(e) {
         let artistInit = e.target.value;
         let artist = artistInit.replace(' ', '%20'); //Replaces spaces with URL encoding for spaces used in Spotify API call.
-        console.log(artist)
         this.setState({
             tempArtist: artist,
         });
@@ -229,6 +233,9 @@ export default class Home extends Component {
      */
     updateTempRating(e) {
         let rating = (e.target.value)/20; //formats rating into a range of 0-5 rather than 0-100.
+        rating = rating.toPrecision(2)
+        if(rating < .1)
+            rating = Math.floor(rating);
         this.setState({
             tempRating: rating,
         });
@@ -318,10 +325,31 @@ export default class Home extends Component {
         let count = 1;
         albums.forEach(entry => {
             components.push(
-                <option id={count++}>{entry.albumName}</option>
+                <option key={count++} >{entry.albumName}</option>
             );
         });
         return components;
+    }
+
+    /**
+     * onChange function that updates the tempRating and TempReview states.
+     * @param {HTMLInputElement} e Inout object which its value is extracted.
+     */
+    makeEditSelection(e) {
+        this.setState({
+            tempRating: this.state.entries[e.target.selectedIndex].albumRating,
+            tempReview: this.state.entries[e.target.selectedIndex].albumReview,
+            editIndex: e.target.selectedIndex,
+        });
+    }
+
+    updateReview() {
+        const db = getDatabase();
+        update(ref(db, 'musicRatings/' + (this.state.editIndex)), {
+            albumRating: this.state.tempRating,
+            albumReview: this.state.tempReview,
+        });
+        this.toggleEditModal();
     }
 
     render() {
@@ -359,14 +387,22 @@ export default class Home extends Component {
                                 <Form>
                                     <div>
                                         <Label>Album</Label>
-                                        <Input type="select">
+                                        <Input type="select" onChange={this.makeEditSelection}>
                                             {this.loadOptions()}
                                         </Input>
+                                    </div>
+                                    <div>
+                                        <Label>Rating: {this.state.tempRating}</Label>
+                                        <Input type="range" onChange={this.updateTempRating} defaultValue={this.state.tempRating}/>
+                                    </div>
+                                    <div>
+                                        <Label>Review</Label>
+                                        <Input type="textarea" onChange={this.updateTempReview} defaultValue={this.state.tempReview} />
                                     </div>
                                 </Form>
                             </ModalBody>
                             <ModalFooter>
-                                <Button color="success">Submit</Button>
+                                <Button color="success" onClick={this.updateReview}>Submit</Button>
                                 <Button color='danger' onClick={this.toggleEditModal}>Cancel</Button>
                             </ModalFooter>
                         </Modal>

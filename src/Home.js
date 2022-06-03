@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Buffer } from "buffer";
 import spotifyConfig from "./SpotifyConfig";
 import { getDatabase, ref, set, onValue, update } from "firebase/database";
-import { Card, CardBody, Container, Nav, NavItem,Row, Table, Button, ModalHeader, ModalBody, Label, Modal, Input, Form, ModalFooter, UncontrolledPopover, PopoverHeader, PopoverBody, Col, NavLink } from "reactstrap";
+import { Container, Row, Table, Button, ModalHeader, ModalBody, Label, Modal, Input, Form, ModalFooter, UncontrolledPopover, PopoverHeader, PopoverBody, Col } from "reactstrap";
 
 
 export default class Home extends Component {
@@ -216,7 +216,7 @@ export default class Home extends Component {
      * onChange function used to update the tempAlbum state.
      * @param {HTMLInputElement} e Input object which its value is extracted.
      */
-    updateTempAlbum(e) {       
+    updateTempAlbum(e) {
         const albums = this.state.artistSearchResults;
         const index = e.target.selectedIndex;
         const selectedAlbum = albums[index];
@@ -281,9 +281,13 @@ export default class Home extends Component {
         let list = this.state.entries;
         let componets = [];
         let count = 1;
+        list.sort((a,b) => {
+            return a.artistName.localeCompare(b.artistName);
+        });
+        console.log(list)
         list.forEach(entry => {
             let color = '';
-            if(entry.albumRating <= 1.75)
+            if(entry.albumRating <= 2.5)
                 color = 'danger';
             else if(entry.albumRating <= 3.5)
                 color = 'warning';
@@ -292,13 +296,13 @@ export default class Home extends Component {
 
             componets.push(
                 <tr key={count++}>
-                    <td height="50" width="50" >
-                        <img src={entry.albumArtURL} alt="Cover"  height="50" width="50" style={{display: "block", marginLeft: 'auto', marginRight: 'auto'}}></img>
+                    <td height="70" width="70" >
+                        <img src={entry.albumArtURL} alt="Cover"  height="60" width="60" style={{display: "block", marginLeft: 'auto', marginRight: 'auto'}}></img>
                     </td>
                     <td>{entry.artistName}</td>
                     <td>{entry.albumName}</td>
-                    <td>{entry.albumRating}</td>
-                    <td width="100">
+                    <td class="rating">{entry.albumRating}</td>
+                    <td class="pop-over" width="100">
                         <Button color={color} id={"popoverClick" +count}>Review</Button>
                         <UncontrolledPopover placement="bottom" target={"popoverClick" + count} trigger="focus">
                             <PopoverHeader>
@@ -343,6 +347,9 @@ export default class Home extends Component {
         });
     }
 
+    /**
+     * Makes an update request to the database to update the albumRating and albumReview values.
+     */
     updateReview() {
         const db = getDatabase();
         update(ref(db, 'musicRatings/' + (this.state.editIndex)), {
@@ -361,24 +368,14 @@ export default class Home extends Component {
                         Music Rating
                     </h1>
                 <Row>
-                    <Card>
-                        <Nav tabs pills >
-                            <NavItem>
-                                <NavLink onClick={this.toggleAddModal}>
-                                    Add a Rating
-                                </NavLink>
-                            </NavItem>
-                            <NavItem>
-                                <NavLink>
-                                    Remove Rating
-                                </NavLink>
-                            </NavItem>
-                            <NavItem>
-                                <NavLink onClick={this.toggleEditModal}>
-                                    Edit Rating
-                                </NavLink>
-                            </NavItem>
-                        </Nav>
+                    <div id="nav-bar">
+                        <button class="nav-button" id="add-rating" onClick={this.toggleAddModal}>
+                            Add a Rating
+                        </button>
+                        <button class="nav-button" id="edit-rating" onClick={this.toggleEditModal}>
+                            Edit Rating
+                        </button>
+                    </div>
                         <Modal isOpen={this.state.editModalState} toggle={()=> this.toggleEditModal}>
                             <ModalHeader>
                                 Edit a Review
@@ -406,14 +403,13 @@ export default class Home extends Component {
                                 <Button color='danger' onClick={this.toggleEditModal}>Cancel</Button>
                             </ModalFooter>
                         </Modal>
-                        <CardBody>
-                            <Table striped responsive bordered hover>
+                            <Table striped bordered hover dark>
                                 <thead>
                                     <tr>
                                         <th/>
                                         <th>Artist</th>
                                         <th>Album</th>
-                                        <th>Rating</th>
+                                        <th class="rating">Rating</th>
                                         <th/>
                                     </tr>
                                 </thead>
@@ -459,8 +455,6 @@ export default class Home extends Component {
                                     <Button onClick={this.toggleAddModal} color="danger" >Cancel</Button>
                                 </ModalFooter>
                             </Modal>
-                        </CardBody>
-                    </Card>
                 </Row>
             </Container>
         );

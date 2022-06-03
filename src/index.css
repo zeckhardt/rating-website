@@ -11,3 +11,104 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+h1 {
+  text-align: center;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  border-width: 5px;
+  border-style: solid;
+  border-radius: 10px;
+  border-color: #949451;
+  color: #949451;
+  background-color: #35393c;
+}
+
+td.pop-over {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+}
+
+th, tr {
+  font-family: Merriweather;
+  font-size: large;
+}
+
+th {
+  font-style: bold;
+  font-size: x-large;
+}
+
+button.nav-button {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  width: 125px;
+  border-radius: 12px;
+  padding: 10px 5px 10px 5px;
+  margin-bottom: 10px;
+  background-color: #306bc9;
+  color: white;
+  border-style: none;
+}
+
+div#nav-bar {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+button#add-rating {
+  margin-right: 50px;
+  
+}
+
+button#edit-rating {
+  margin-left: 50px;
+}
+
+#root {
+  background-color: #212529;
+}
+
+div.modal-content {
+  background-color: #212529;
+}
+
+label, h5 {
+  color: #949451;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+}
+
+input.form-control, select.form-select, textarea.form-control {
+  background-color: #35393c;
+  border-color: white;
+  color: white;
+}
+
+h5 {
+  border-width: 3px;
+  border-style: solid;
+  border-radius: 10px;
+  border-color: #949451;
+  padding: 5px 5px 5px 5px;
+  background-color: #35393c;
+}
+
+button.btn.btn-secondary {
+  background-color: #306bc9;
+  border-style: none;
+}
+
+div.popover.show.bs-popover-auto {
+  background-color: #35393c;
+  color: rgb(224, 221, 221);
+}
+
+div.popover-body {
+  color: white;
+}
+
+h3.popover-header {
+  color: black;
+}
+
+.rating {
+  text-align: center;
+}

@@ -22,6 +22,7 @@ export default class Home extends Component {
             accessToken: "",
             artistSearchResults: [],
             editIndex: null,
+            originalEntries: [],
         }
 
         //Bindings
@@ -47,6 +48,7 @@ export default class Home extends Component {
             const data = snapshot.val();
             this.setState({
                 entries: data,
+                originalEntries: data
             });
         });
         this.getAccessToken();
@@ -278,8 +280,9 @@ export default class Home extends Component {
      * @returns An array of HTMLTableRow elements.
      */
     parseEntries() {
-        let list = this.state.entries;
+        let list = this.state.entries.slice();
         let componets = [];
+
         let count = 1;
         list.sort((a,b) => {
             return a.artistName.localeCompare(b.artistName);
@@ -324,7 +327,7 @@ export default class Home extends Component {
      * @returns An array of HTMLOption elements.
      */
     loadOptions() {
-        const albums = this.state.entries;
+        const albums = this.state.originalEntries;
         let components = [];
         let count = 1;
         albums.forEach(entry => {
@@ -341,8 +344,8 @@ export default class Home extends Component {
      */
     makeEditSelection(e) {
         this.setState({
-            tempRating: this.state.entries[e.target.selectedIndex].albumRating,
-            tempReview: this.state.entries[e.target.selectedIndex].albumReview,
+            tempRating: this.state.originalEntries[e.target.selectedIndex].albumRating,
+            tempReview: this.state.originalEntries[e.target.selectedIndex].albumReview,
             editIndex: e.target.selectedIndex,
         });
     }

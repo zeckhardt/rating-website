@@ -234,13 +234,16 @@ export default class Home extends Component {
      * @param {HTMLInputElement} e Inout object which its value is extracted.
      */
     updateTempRating(e) {
-        let rating = (e.target.value)/20; //formats rating into a range of 0-5 rather than 0-100.
+        let rating = (e.target.value)/10; //formats rating into a range of 0-10 rather than 0-100.
         rating = rating.toPrecision(2)
-        if(rating < .1)
-            rating = Math.floor(rating);
+        rating = this.nearestHalf(rating);
         this.setState({
             tempRating: rating,
         });
+    }
+
+    nearestHalf(num) {
+        return Math.round(num/.5)*.5;
     }
 
     /**
@@ -290,9 +293,9 @@ export default class Home extends Component {
         console.log(list)
         list.forEach(entry => {
             let color = '';
-            if(entry.albumRating <= 2.5)
+            if(entry.albumRating < 5)
                 color = 'danger';
-            else if(entry.albumRating <= 3.5)
+            else if(entry.albumRating < 7)
                 color = 'warning';
             else
                 color = 'success';

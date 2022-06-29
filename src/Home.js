@@ -307,7 +307,7 @@ export default class Home extends Component {
                     <td class="rating">{entry.albumRating}</td>
                     <td class="pop-over" width="100">
                         <Button color={color} id={"popoverClick" +count}>Review</Button>
-                        <UncontrolledPopover placement="bottom" target={"popoverClick" + count} trigger="focus">
+                        <UncontrolledPopover placement="bottom" target={"popoverClick" + count} trigger="legacy">
                             <PopoverHeader>
                                 {entry.albumName + " review"}
                             </PopoverHeader>

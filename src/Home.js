@@ -220,8 +220,11 @@ export default class Home extends Component {
      */
     updateTempAlbum(e) {
         const albums = this.state.artistSearchResults;
-        const index = e.target.selectedIndex;
+        const index = e.target.selectedIndex -1;
+        console.log(albums)
+        console.log(index)
         const selectedAlbum = albums[index];
+        console.log(selectedAlbum)
         this.setState({
             tempAlbum: selectedAlbum.name,
             tempArtist: selectedAlbum.artists[0].name,
@@ -242,6 +245,11 @@ export default class Home extends Component {
         });
     }
 
+    /**
+     * Helper function used for rounding to the nearest half number.
+     * @param {Number} num Number that is being rounded.
+     * @returns A number value rounded to the nearest 0.5.
+     */
     nearestHalf(num) {
         return Math.round(num/.5)*.5;
     }
@@ -254,6 +262,10 @@ export default class Home extends Component {
         const results = this.state.artistSearchResults;
         let components = [];
         let count =1;
+        components.push(
+            <option  value={"default"} disabled></option>
+        );
+        
         results.forEach(entry => {
             components.push(
                 <option key={count++}>{entry.name}</option>

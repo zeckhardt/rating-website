@@ -183,13 +183,14 @@ export default class Home extends Component {
         let lookup = {};
         let output = [];
 
-        axios.get(`https://api.spotify.com/v1/artists/${artist.data.artists.items[0].id}/albums`,{ 
+        axios.get(`https://api.spotify.com/v1/artists/${artist.data.artists.items[0].id}/albums?limit=30&offset=0`,{ 
                 headers: {
                     'Authorization': 'Bearer ' + this.state.accessToken,
                     'Content-Type': 'application-json'
                 }
             })
             .then(function (response) {
+                console.log(response)
                 let albums = [];
                 response.data.items.forEach(entry => {
                     if(entry.album_type === "album" && !response.data.items.includes(entry.name)) {
@@ -221,10 +222,7 @@ export default class Home extends Component {
     updateTempAlbum(e) {
         const albums = this.state.artistSearchResults;
         const index = e.target.selectedIndex -1;
-        console.log(albums)
-        console.log(index)
         const selectedAlbum = albums[index];
-        console.log(selectedAlbum)
         this.setState({
             tempAlbum: selectedAlbum.name,
             tempArtist: selectedAlbum.artists[0].name,
@@ -387,10 +385,10 @@ export default class Home extends Component {
                     </h1>
                 <Row>
                     <div id="nav-bar">
-                        <button class="nav-button" id="add-rating" onClick={this.toggleAddModal}>
+                        <button  class="nav-button" id="add-rating" onClick={this.toggleAddModal}>
                             Add a Rating
                         </button>
-                        <button class="nav-button" id="edit-rating" onClick={this.toggleEditModal}>
+                        <button  class="nav-button" id="edit-rating" onClick={this.toggleEditModal}>
                             Edit Rating
                         </button>
                     </div>
@@ -454,7 +452,7 @@ export default class Home extends Component {
                                         </div>
                                         <div>
                                             <Label>Album name</Label>
-                                            <Input type="select" onChange={this.updateTempAlbum}>
+                                            <Input class="loadList" type="select" onChange={this.updateTempAlbum}>
                                                 {this.renderInput()}
                                             </Input>
                                         </div>

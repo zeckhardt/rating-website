@@ -1,5 +1,6 @@
 import React, {Component} from "react";
 import axios from 'axios';
+import jimmyJohn from './gloob';
 import { Buffer } from "buffer";
 import spotifyConfig from "./SpotifyConfig";
 import { getDatabase, ref, set, onValue, update } from "firebase/database";
@@ -13,6 +14,9 @@ export default class Home extends Component {
         this.state = {
             addModalState: false,
             editModalState: false,
+            loginModalState: false,
+            hiddenState: true,
+            inPass: "",
             tempAlbum: "",
             tempArtist: "",
             tempRating: null,
@@ -38,6 +42,9 @@ export default class Home extends Component {
         this.getArtistResults = this.getArtistResults.bind(this);
         this.makeEditSelection = this.makeEditSelection.bind(this);
         this.updateReview = this.updateReview.bind(this);
+        this.toggleLoginModal = this.toggleLoginModal.bind(this);
+        this.updatePassState = this.updatePassState.bind(this);
+        this.loginHandler = this.loginHandler.bind(this);
     }
 
 
@@ -375,6 +382,29 @@ export default class Home extends Component {
         this.toggleEditModal();
     }
 
+    toggleLoginModal() {
+        this.setState({
+            loginModalState: !this.state.loginModalState,
+            inPass: "",
+        });
+    }
+
+    updatePassState(e) {
+        let pass = e.target.value;
+        this.setState({
+            inPass: pass,
+        });
+    }
+
+    loginHandler() {
+        if(this.state.inPass === jimmyJohn) {
+            this.toggleLoginModal();
+            this.setState({
+                hiddenState: !this.state.hiddenState,
+            });
+        } 
+    }
+
     render() {
         return(
             <Container>
@@ -385,13 +415,33 @@ export default class Home extends Component {
                     </h1>
                 <Row>
                     <div id="nav-bar">
-                        <button  class="nav-button" id="add-rating" onClick={this.toggleAddModal}>
+                        <button hidden={this.state.hiddenState} class="nav-button" id="add-rating" onClick={this.toggleAddModal}>
                             Add a Rating
                         </button>
-                        <button  class="nav-button" id="edit-rating" onClick={this.toggleEditModal}>
+                        <button hidden={!this.state.hiddenState} class="nav-button" id="login-b" onClick={this.toggleLoginModal}>
+                            Login
+                        </button>
+                        <button hidden={this.state.hiddenState} class="nav-button" id="edit-rating" onClick={this.toggleEditModal}>
                             Edit Rating
                         </button>
                     </div>
+                    <Modal isOpen={this.state.loginModalState} toggle={() => this.toggleLoginModal}>
+                        <ModalHeader>
+                            Admin Login
+                        </ModalHeader>
+                        <ModalBody>
+                            <Form>
+                                <div>
+                                    <Label>Admin Login</Label>
+                                    <Input type="password" placeholder="Password" id="password" onChange={this.updatePassState} />
+                                </div>
+                            </Form>
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button color='danger' onClick={this.toggleLoginModal}>Cancel</Button>
+                            <Button class="submit-login" id="good-login" onClick={this.loginHandler}>Login</Button>
+                        </ModalFooter>
+                    </Modal>
                         <Modal isOpen={this.state.editModalState} toggle={()=> this.toggleEditModal}>
                             <ModalHeader>
                                 Edit a Review

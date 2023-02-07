@@ -3,7 +3,7 @@ import axios from 'axios';
 import jimmyJohn from './gloob';
 import { Buffer } from "buffer";
 import spotifyConfig from "./SpotifyConfig";
-import { getDatabase, ref, set, onValue, update } from "firebase/database";
+import { getDatabase, ref, set, onValue, update, push } from "firebase/database";
 import { Container, Row, Table, Button, ModalHeader, ModalBody, Label, Modal, Input, Form, ModalFooter, UncontrolledPopover, PopoverHeader, PopoverBody, Col } from "reactstrap";
 
 
@@ -22,6 +22,8 @@ export default class Home extends Component {
             tempRating: null,
             tempReview: "",
             tempURL: "",
+            tempSpotifyURL: "",
+            tempDate: "",
             entries: [],
             accessToken: "",
             artistSearchResults: [],
@@ -143,6 +145,8 @@ export default class Home extends Component {
             tempAlbum: "",
             tempArtist: "",
             tempRating: null,
+            tempSpotifyURL: "",
+            tempDate: "",
             artistSearchResults: []
         });
     }
@@ -230,10 +234,20 @@ export default class Home extends Component {
         const albums = this.state.artistSearchResults;
         const index = e.target.selectedIndex -1;
         const selectedAlbum = albums[index];
+        const spotifyURL = selectedAlbum['external_urls']['spotify'];
+        let artist = ''
+        selectedAlbum.artists.forEach(a => {
+            artist += (a.name + ' & ');
+        });
+        if(artist.slice(-2) === '& ')
+            artist=artist.slice(0,-3);
+
         this.setState({
             tempAlbum: selectedAlbum.name,
-            tempArtist: selectedAlbum.artists[0].name,
+            tempArtist: artist,
             tempURL: selectedAlbum.images[2].url,
+            tempSpotifyURL: spotifyURL,
+            tempDate: selectedAlbum['release_date']
         });
     }
 
@@ -290,6 +304,8 @@ export default class Home extends Component {
             albumRating: this.state.tempRating,
             albumReview: this.state.tempReview,
             albumArtURL: this.state.tempURL,
+            albumSpotifyURL: this.state.tempSpotifyURL,
+            releaseDate: this.state.tempDate,
         });
 
         this.toggleAddModal();
@@ -300,15 +316,35 @@ export default class Home extends Component {
      * @returns An array of HTMLTableRow elements.
      */
     parseEntries() {
-        let list = this.state.entries.slice();
+       let list = this.state.entries.slice();
         let componets = [];
+        let dir = {};
 
-        let count = 1;
-        list.sort((a,b) => {
-            return a.artistName.localeCompare(b.artistName);
+        list.forEach(album => {
+            if(dir.hasOwnProperty(album.artistName))
+                dir[album.artistName].push(album);
+            else
+                dir[album.artistName] = [album];
         });
-        console.log(list)
-        list.forEach(entry => {
+
+        
+        //sort the keys
+        let count = 1;
+        let keys = Object.keys(dir);
+        keys.sort((a,b) => {
+            return a.localeCompare(b);
+        });
+        //sort the values
+        Object.keys(dir).forEach(artist => {
+            dir[artist].sort((a,b) => {
+                return new Date(b.releaseDate) - new Date(a.releaseDate);
+            });
+        });
+
+        
+
+        keys.forEach(artist => {
+            dir[artist].forEach(entry => {
             let color = '';
             if(entry.albumRating < 5)
                 color = 'danger';
@@ -320,7 +356,9 @@ export default class Home extends Component {
             componets.push(
                 <tr key={count++}>
                     <td height="70" width="70" >
-                        <img src={entry.albumArtURL} alt="Cover"  height="60" width="60" style={{display: "block", marginLeft: 'auto', marginRight: 'auto'}}></img>
+                        <a href={entry.albumSpotifyURL} target="_blank" rel="noreferrer">
+                            <img src={entry.albumArtURL} alt="Cover"  height="60" width="60" style={{display: "block", marginLeft: 'auto', marginRight: 'auto'}}></img>
+                        </a>
                     </td>
                     <td>{entry.artistName}</td>
                     <td>{entry.albumName}</td>
@@ -338,6 +376,7 @@ export default class Home extends Component {
                     </td>
                 </tr>
             );
+        });
         });
         return componets;
     }
@@ -382,6 +421,9 @@ export default class Home extends Component {
         this.toggleEditModal();
     }
 
+    /**
+     * Handles the state of the login modal, toggling it on and off.
+     */
     toggleLoginModal() {
         this.setState({
             loginModalState: !this.state.loginModalState,
@@ -389,6 +431,10 @@ export default class Home extends Component {
         });
     }
 
+    /**
+     * Handles updating the currently typed password and setting the inPass state.
+     * @param {HTMLInputElement} e Input object which its value is extracted.
+     */
     updatePassState(e) {
         let pass = e.target.value;
         this.setState({
@@ -396,6 +442,9 @@ export default class Home extends Component {
         });
     }
 
+    /**
+     * Handles when a user tries to enter a password and evalutates if it is the correct one.
+     */
     loginHandler() {
         if(this.state.inPass === jimmyJohn) {
             this.toggleLoginModal();

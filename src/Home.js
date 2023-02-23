@@ -3,7 +3,7 @@ import axios from 'axios';
 import jimmyJohn from './gloob';
 import { Buffer } from "buffer";
 import spotifyConfig from "./SpotifyConfig";
-import { getDatabase, ref, set, onValue, update, push } from "firebase/database";
+import { getDatabase, ref, set, onValue, update } from "firebase/database";
 import { Container, Row, Table, Button, ModalHeader, ModalBody, Label, Modal, Input, Form, ModalFooter, UncontrolledPopover, PopoverHeader, PopoverBody, Col } from "reactstrap";
 
 
@@ -237,9 +237,9 @@ export default class Home extends Component {
         const spotifyURL = selectedAlbum['external_urls']['spotify'];
         let artist = ''
         selectedAlbum.artists.forEach(a => {
-            artist += (a.name + ' & ');
+            artist += (a.name + ' • ');
         });
-        if(artist.slice(-2) === '& ')
+        if(artist.slice(-2) === '• ')
             artist=artist.slice(0,-3);
 
         this.setState({
@@ -278,7 +278,7 @@ export default class Home extends Component {
      * @returns An array containing HTML option components.
      */
     renderInput() {
-        const results = this.state.artistSearchResults;
+        let results = this.state.artistSearchResults;
         let components = [];
         let count =1;
         components.push(
@@ -327,7 +327,7 @@ export default class Home extends Component {
                 dir[album.artistName] = [album];
         });
 
-        
+
         //sort the keys
         let count = 1;
         let keys = Object.keys(dir);
@@ -364,7 +364,7 @@ export default class Home extends Component {
                     <td>{entry.albumName}</td>
                     <td class="rating">{entry.albumRating}</td>
                     <td class="pop-over" width="100">
-                        <Button color={color} id={"popoverClick" +count}>Review</Button>
+                        <Button color={color} style={{fontSize: "large"}} id={"popoverClick" +count}>Review</Button>
                         <UncontrolledPopover placement="bottom" target={"popoverClick" + count} trigger="legacy">
                             <PopoverHeader>
                                 {entry.albumName + " review"}

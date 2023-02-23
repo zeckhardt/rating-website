@@ -8,13 +8,12 @@ body {
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
 h1 {
   text-align: center;
-  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
   border-width: 5px;
   border-style: solid;
   border-radius: 10px;
@@ -24,11 +23,11 @@ h1 {
 }
 
 td.pop-over {
-  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
 th, tr {
-  font-family: Merriweather;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
   font-size: large;
 }
 
@@ -38,7 +37,7 @@ th {
 }
 
 button.nav-button {
-  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
   width: 125px;
   border-radius: 12px;
   padding: 10px 5px 10px 5px;
@@ -46,6 +45,7 @@ button.nav-button {
   background-color: #306bc9;
   color: white;
   border-style: none;
+  font-size: large;
 }
 
 div#nav-bar {
@@ -73,7 +73,7 @@ div.modal-content {
 
 label, h5 {
   color: #949451;
-  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
 }
 
 input.form-control, select.form-select, textarea.form-control {

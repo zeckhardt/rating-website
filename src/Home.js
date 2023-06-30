@@ -4,7 +4,8 @@ import jimmyJohn from './gloob';
 import { Buffer } from "buffer";
 import spotifyConfig from "./SpotifyConfig";
 import { getDatabase, ref, set, onValue, update } from "firebase/database";
-import { Container, Row, Table, Button, ModalHeader, ModalBody, Label, Modal, Input, Form, ModalFooter, UncontrolledPopover, PopoverHeader, PopoverBody, Col } from "reactstrap";
+import { Container, Row, Table, Button, ModalHeader, ModalBody, Label, Modal, Input, Form, ModalFooter, UncontrolledPopover, PopoverHeader, PopoverBody, Col, UncontrolledAccordion, AccordionHeader, AccordionBody } from "reactstrap";
+import { Tab } from "bootstrap";
 
 
 export default class Home extends Component {
@@ -311,39 +312,9 @@ export default class Home extends Component {
         this.toggleAddModal();
     }
 
-    /**
-     * Iterates through the array of album reviews and creates table entries for each of them with all the embedded data.
-     * @returns An array of HTMLTableRow elements.
-     */
-    parseEntries() {
-       let list = this.state.entries.slice();
-        let componets = [];
-        let dir = {};
-
-        list.forEach(album => {
-            if(dir.hasOwnProperty(album.artistName))
-                dir[album.artistName].push(album);
-            else
-                dir[album.artistName] = [album];
-        });
-
-
-        //sort the keys
+    test(dir, artist) {
         let count = 1;
-        let keys = Object.keys(dir);
-        keys.sort((a,b) => {
-            return a.localeCompare(b);
-        });
-        //sort the values
-        Object.keys(dir).forEach(artist => {
-            dir[artist].sort((a,b) => {
-                return new Date(b.releaseDate) - new Date(a.releaseDate);
-            });
-        });
-
-        
-
-        keys.forEach(artist => {
+        let comp2 = [];
             dir[artist].forEach(entry => {
             let color = '';
             if(entry.albumRating < 5)
@@ -353,8 +324,9 @@ export default class Home extends Component {
             else
                 color = 'success';
 
-            componets.push(
+            comp2.push(
                 <tr key={count++}>
+                    
                     <td height="70" width="70" >
                         <a href={entry.albumSpotifyURL} target="_blank" rel="noreferrer">
                             <img src={entry.albumArtURL} alt="Cover"  height="60" width="60" style={{display: "block", marginLeft: 'auto', marginRight: 'auto'}}></img>
@@ -374,9 +346,107 @@ export default class Home extends Component {
                             </PopoverBody>
                         </UncontrolledPopover>
                     </td>
+                    
                 </tr>
             );
         });
+        return comp2;
+    }
+
+    /**
+     * Iterates through the array of album reviews and creates table entries for each of them with all the embedded data.
+     * @returns An array of HTMLTableRow elements.
+     */
+    parseEntries() {
+       let list = this.state.entries.slice();
+        let componets = [];
+        let dir = {};
+
+        list.forEach(album => {
+            if(dir.hasOwnProperty(album.artistName))
+                dir[album.artistName].push(album);
+            else
+                dir[album.artistName] = [album];
+        });
+        console.log(dir)
+
+        //sort the keys
+        let count = 1;
+        let keys = Object.keys(dir);
+        keys.sort((a,b) => {
+            return a.localeCompare(b);
+        });
+        //sort the values
+        Object.keys(dir).forEach(artist => {
+            dir[artist].sort((a,b) => {
+                return new Date(b.releaseDate) - new Date(a.releaseDate);
+            });
+        });
+
+        let run;
+        keys.forEach(artist => {
+            componets.push(
+                <tr key={count++}>
+                    <UncontrolledAccordion>
+                        <AccordionHeader className="accordion" targetId="1">{artist}</AccordionHeader>
+                        <AccordionBody accordionId="1">
+                        {
+                            <Table striped bordered hover dark>
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Artist</th>
+                                        <th>Album</th>
+                                        <th class="rating">Rating</th>
+                                        <th/>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {
+                                        this.test(dir, artist)
+                                    }
+                                </tbody>
+                            </Table>
+                        }
+                        </AccordionBody>
+                    </UncontrolledAccordion>
+                </tr>
+            );
+        //     dir[artist].forEach(entry => {
+        //     let color = '';
+        //     if(entry.albumRating < 5)
+        //         color = 'danger';
+        //     else if(entry.albumRating < 7)
+        //         color = 'warning';
+        //     else
+        //         color = 'success';
+
+        //     componets.push(
+        //         <tr key={count++}>
+        //             <Accordion>
+        //             <td height="70" width="70" >
+        //                 <a href={entry.albumSpotifyURL} target="_blank" rel="noreferrer">
+        //                     <img src={entry.albumArtURL} alt="Cover"  height="60" width="60" style={{display: "block", marginLeft: 'auto', marginRight: 'auto'}}></img>
+        //                 </a>
+        //             </td>
+        //             <td>{entry.artistName}</td>
+        //             <td>{entry.albumName}</td>
+        //             <td class="rating">{entry.albumRating}</td>
+        //             <td class="pop-over" width="100">
+        //                 <Button color={color} style={{fontSize: "large"}} id={"popoverClick" +count}>Review</Button>
+        //                 <UncontrolledPopover placement="bottom" target={"popoverClick" + count} trigger="legacy">
+        //                     <PopoverHeader>
+        //                         {entry.albumName + " review"}
+        //                     </PopoverHeader>
+        //                     <PopoverBody>
+        //                             {entry.albumReview}
+        //                     </PopoverBody>
+        //                 </UncontrolledPopover>
+        //             </td>
+        //             </Accordion>
+        //         </tr>
+        //     );
+        // });
         });
         return componets;
     }
@@ -455,6 +525,7 @@ export default class Home extends Component {
     }
 
     render() {
+
         return(
             <Container>
                 <Row />                    
@@ -520,13 +591,13 @@ export default class Home extends Component {
                         </Modal>
                             <Table striped bordered hover dark>
                                 <thead>
-                                    <tr>
+                                    {/* <tr>
                                         <th/>
                                         <th>Artist</th>
                                         <th>Album</th>
                                         <th class="rating">Rating</th>
                                         <th/>
-                                    </tr>
+                                    </tr> */}
                                 </thead>
                                 <tbody>
                                     {this.parseEntries()}

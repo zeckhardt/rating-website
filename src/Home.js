@@ -29,26 +29,8 @@ export default class Home extends Component {
             artistSearchResults: [],
             editIndex: null,
             originalEntries: [],
-        }
-
-        //Bindings
-        this.toggleAddModal = this.toggleAddModal.bind(this);
-        this.toggleEditModal = this.toggleEditModal.bind(this);
-        this.updateTempAlbum = this.updateTempAlbum.bind(this);
-        this.updateTempArtist = this.updateTempArtist.bind(this);
-        this.updateTempRating = this.updateTempRating.bind(this);
-        this.addEntry = this.addEntry.bind(this);
-        this.updateTempReview = this.updateTempReview.bind(this);
-        this.getAccessToken = this.getAccessToken.bind(this);
-        this.getAlbum = this.getAlbum.bind(this);
-        this.getArtistResults = this.getArtistResults.bind(this);
-        this.makeEditSelection = this.makeEditSelection.bind(this);
-        this.updateReview = this.updateReview.bind(this);
-        this.toggleLoginModal = this.toggleLoginModal.bind(this);
-        this.updatePassState = this.updatePassState.bind(this);
-        this.loginHandler = this.loginHandler.bind(this);
+        };
     }
-
 
     componentDidMount() {
         const db = getDatabase();
@@ -118,7 +100,7 @@ export default class Home extends Component {
      * onChange function that updates the tempReview state.
      * @param {HTMLInputElement} e Input object which its value is extracted.
      */
-    updateTempReview(e) {
+    updateTempReview = e => {
         let review = e.target.value;
         this.setState({
             tempReview: review,
@@ -128,7 +110,7 @@ export default class Home extends Component {
     /** 
      * Used to change the state of the edit review modal from on and off.
     */
-    toggleEditModal() {
+    toggleEditModal = () => {
         this.setState({
             editModalState: !this.state.editModalState,
             tempRating: null,
@@ -139,7 +121,7 @@ export default class Home extends Component {
     /**
      * Used to change the state of the add review modal from on and off.
      */
-    toggleAddModal() {
+    toggleAddModal = () => {
         this.setState({
             addModalState: !this.state.addModalState,
             tempAlbum: "",
@@ -155,7 +137,7 @@ export default class Home extends Component {
      * onChange function used to update the tempArtist state.
      * @param {HTMLInputElement} e Input object which its value is extracted.
      */
-    updateTempArtist(e) {
+    updateTempArtist = e => {
         let artistInit = e.target.value;
         let artist = artistInit.replace(' ', '%20'); //Replaces spaces with URL encoding for spaces used in Spotify API call.
         this.setState({
@@ -166,7 +148,7 @@ export default class Home extends Component {
     /**
      * Queries the spotify API for user inputed artist name.
      */
-    getArtistResults() {
+    getArtistResults = () => {
         let artist = this.state.tempArtist;
         const token = this.state.accessToken;
         const context = this;
@@ -189,7 +171,7 @@ export default class Home extends Component {
      * Queries the Spotify API for all of a certain artist's albums.
      * @param {String} artist The string name of the artist for the query
      */
-    searchAlbums(artist) {
+    searchAlbums = artist => {
         const context = this;
         let lookup = {};
         let output = [];
@@ -230,7 +212,7 @@ export default class Home extends Component {
      * onChange function used to update the tempAlbum state.
      * @param {HTMLInputElement} e Input object which its value is extracted.
      */
-    updateTempAlbum(e) {
+    updateTempAlbum = e => {
         const albums = this.state.artistSearchResults;
         const index = e.target.selectedIndex -1;
         const selectedAlbum = albums[index];
@@ -255,7 +237,7 @@ export default class Home extends Component {
      * onChange function used to update the tempRating state.
      * @param {HTMLInputElement} e Inout object which its value is extracted.
      */
-    updateTempRating(e) {
+    updateTempRating = e => {
         let rating = (e.target.value)/10; //formats rating into a range of 0-10 rather than 0-100.
         rating = rating.toPrecision(2)
         rating = this.nearestHalf(rating);
@@ -269,7 +251,7 @@ export default class Home extends Component {
      * @param {Number} num Number that is being rounded.
      * @returns A number value rounded to the nearest 0.5.
      */
-    nearestHalf(num) {
+    nearestHalf = num => {
         return Math.round(num/.5)*.5;
     }
 
@@ -277,7 +259,7 @@ export default class Home extends Component {
      * Reads the artistSearchResult state and creates option elements with the names of each album in the results.
      * @returns An array containing HTML option components.
      */
-    renderInput() {
+    renderInput = () => {
         let results = this.state.artistSearchResults;
         let components = [];
         let count =1;
@@ -296,7 +278,7 @@ export default class Home extends Component {
     /**
      * Writes the inputted user review into a new database entry.
      */
-    addEntry() {
+    addEntry = () => {
         const db = getDatabase();
         set(ref(db, 'musicRatings/' + (this.state.entries.length)), {
             artistName: this.state.tempArtist,
@@ -315,16 +297,20 @@ export default class Home extends Component {
      * Iterates through the array of album reviews and creates table entries for each of them with all the embedded data.
      * @returns An array of HTMLTableRow elements.
      */
-    parseEntries() {
+    parseEntries = () => {
        let list = this.state.entries.slice();
         let componets = [];
         let dir = {};
 
         list.forEach(album => {
-            if(dir.hasOwnProperty(album.artistName))
-                dir[album.artistName].push(album);
-            else
-                dir[album.artistName] = [album];
+            let artists = album.artistName.split('•')
+            artists.forEach(artist => {
+                artist = artist.trim();
+                if(dir.hasOwnProperty(artist))
+                    dir[artist].push(album);
+                else
+                    dir[artist] = [album];
+            })
         });
 
 
@@ -341,9 +327,19 @@ export default class Home extends Component {
             });
         });
 
-        
+        //Don't need to list this
+        keys.splice(keys.indexOf('KAYTRAMINÉ'), 1);
 
         keys.forEach(artist => {
+            componets.push(
+                <tr>
+                    <th/>
+                    <th className="heads">{artist}</th>
+                    <th/>
+                    <th/>
+                    <th/>
+                </tr>
+            );
             dir[artist].forEach(entry => {
             let color = '';
             if(entry.albumRating < 5)
@@ -385,7 +381,7 @@ export default class Home extends Component {
      * Loads all the album reviews for selection in an Input Select.
      * @returns An array of HTMLOption elements.
      */
-    loadOptions() {
+    loadOptions = () => {
         const albums = this.state.originalEntries;
         let components = [];
         let count = 1;
@@ -401,7 +397,7 @@ export default class Home extends Component {
      * onChange function that updates the tempRating and TempReview states.
      * @param {HTMLInputElement} e Inout object which its value is extracted.
      */
-    makeEditSelection(e) {
+    makeEditSelection = e => {
         this.setState({
             tempRating: this.state.originalEntries[e.target.selectedIndex].albumRating,
             tempReview: this.state.originalEntries[e.target.selectedIndex].albumReview,
@@ -412,7 +408,7 @@ export default class Home extends Component {
     /**
      * Makes an update request to the database to update the albumRating and albumReview values.
      */
-    updateReview() {
+    updateReview = () => {
         const db = getDatabase();
         update(ref(db, 'musicRatings/' + (this.state.editIndex)), {
             albumRating: this.state.tempRating,
@@ -424,7 +420,7 @@ export default class Home extends Component {
     /**
      * Handles the state of the login modal, toggling it on and off.
      */
-    toggleLoginModal() {
+    toggleLoginModal = () => {
         this.setState({
             loginModalState: !this.state.loginModalState,
             inPass: "",
@@ -435,7 +431,7 @@ export default class Home extends Component {
      * Handles updating the currently typed password and setting the inPass state.
      * @param {HTMLInputElement} e Input object which its value is extracted.
      */
-    updatePassState(e) {
+    updatePassState = e => {
         let pass = e.target.value;
         this.setState({
             inPass: pass,
@@ -445,7 +441,7 @@ export default class Home extends Component {
     /**
      * Handles when a user tries to enter a password and evalutates if it is the correct one.
      */
-    loginHandler() {
+    loginHandler = () => {
         if(this.state.inPass === jimmyJohn) {
             this.toggleLoginModal();
             this.setState({
@@ -455,123 +451,115 @@ export default class Home extends Component {
     }
 
     render() {
-        return(
-            <Container>
-                <Row />                    
-                <Row lg={5}></Row>
-                    <h1>
-                        Music Rating
-                    </h1>
-                <Row>
-                    <div id="nav-bar">
-                        <button hidden={this.state.hiddenState} class="nav-button" id="add-rating" onClick={this.toggleAddModal}>
-                            Add a Rating
-                        </button>
-                        <button hidden={!this.state.hiddenState} class="nav-button" id="login-b" onClick={this.toggleLoginModal}>
-                            Login
-                        </button>
-                        <button hidden={this.state.hiddenState} class="nav-button" id="edit-rating" onClick={this.toggleEditModal}>
-                            Edit Rating
-                        </button>
-                    </div>
-                    <Modal isOpen={this.state.loginModalState} toggle={() => this.toggleLoginModal}>
-                        <ModalHeader>
-                            Admin Login
-                        </ModalHeader>
-                        <ModalBody>
-                            <Form>
-                                <div>
-                                    <Label>Admin Login</Label>
-                                    <Input type="password" placeholder="Password" id="password" onChange={this.updatePassState} />
-                                </div>
-                            </Form>
-                        </ModalBody>
-                        <ModalFooter>
-                            <Button color='danger' onClick={this.toggleLoginModal}>Cancel</Button>
-                            <Button class="submit-login" id="good-login" onClick={this.loginHandler}>Login</Button>
-                        </ModalFooter>
-                    </Modal>
-                        <Modal isOpen={this.state.editModalState} toggle={()=> this.toggleEditModal}>
-                            <ModalHeader>
-                                Edit a Review
-                            </ModalHeader>
-                            <ModalBody>
-                                <Form>
-                                    <div>
-                                        <Label>Album</Label>
-                                        <Input type="select" onChange={this.makeEditSelection}>
-                                            {this.loadOptions()}
-                                        </Input>
-                                    </div>
-                                    <div>
-                                        <Label>Rating: {this.state.tempRating}</Label>
-                                        <Input type="range" onChange={this.updateTempRating} defaultValue={this.state.tempRating}/>
-                                    </div>
-                                    <div>
-                                        <Label>Review</Label>
-                                        <Input type="textarea" onChange={this.updateTempReview} defaultValue={this.state.tempReview} />
-                                    </div>
-                                </Form>
-                            </ModalBody>
-                            <ModalFooter>
-                                <Button color="success" onClick={this.updateReview}>Submit</Button>
-                                <Button color='danger' onClick={this.toggleEditModal}>Cancel</Button>
-                            </ModalFooter>
-                        </Modal>
-                            <Table striped bordered hover dark>
-                                <thead>
-                                    <tr>
-                                        <th/>
-                                        <th>Artist</th>
-                                        <th>Album</th>
-                                        <th class="rating">Rating</th>
-                                        <th/>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {this.parseEntries()}
-                                </tbody>
-                            </Table>
-                            <Modal isOpen={this.state.addModalState} centered size="lg" toggle={()=> this.toggleAddModal}>
-                                <ModalHeader>
-                                    Add a Rating
-                                </ModalHeader>
-                                <ModalBody>
-                                    <Form>
-                                        <div>
-                                            <Label>Artist name</Label>
-                                            <Row>
-                                                <Col>
-                                                    <Input  type="search" onChange={this.updateTempArtist} />
-                                                </Col>
-                                                <Col>
-                                                    <Button onClick={this.getArtistResults}>Submit</Button>
-                                                </Col>
-                                            </Row>
-                                        </div>
-                                        <div>
-                                            <Label>Album name</Label>
-                                            <Input class="loadList" type="select" onChange={this.updateTempAlbum}>
-                                                {this.renderInput()}
-                                            </Input>
-                                        </div>
-                                        <div>
-                                            <Label>Rating: {this.state.tempRating}</Label>
-                                            <Input type="range" onChange={this.updateTempRating} />
-                                        </div>
-                                        <div>
-                                            <Label>Review</Label>
-                                            <Input type="textarea" onChange={this.updateTempReview} />
-                                        </div>
-                                    </Form>
-                                </ModalBody>
-                                <ModalFooter>
-                                    <Button color="success" onClick={this.addEntry} >Submit</Button>
-                                    <Button onClick={this.toggleAddModal} color="danger" >Cancel</Button>
-                                </ModalFooter>
-                            </Modal>
-                </Row>
-            </Container>
+        return (
+          <Container>
+            <h1>Music Rating</h1>
+            <div id="nav-bar">
+              <button hidden={this.state.hiddenState} className="nav-button" onClick={this.toggleAddModal}>
+                Add a Rating
+              </button>
+              <button hidden={!this.state.hiddenState} className="nav-button" onClick={this.toggleLoginModal}>
+                Login
+              </button>
+              <button hidden={this.state.hiddenState} className="nav-button" onClick={this.toggleEditModal}>
+                Edit Rating
+              </button>
+            </div>
+      
+            <Modal isOpen={this.state.loginModalState} toggle={this.toggleLoginModal}>
+              <ModalHeader>Admin Login</ModalHeader>
+              <ModalBody>
+                <Form>
+                  <div>
+                    <Label>Admin Login</Label>
+                    <Input type="password" placeholder="Password" id="password" onChange={this.updatePassState} />
+                  </div>
+                </Form>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" onClick={this.toggleLoginModal}>Cancel</Button>
+                <Button className="submit-login" onClick={this.loginHandler}>Login</Button>
+              </ModalFooter>
+            </Modal>
+      
+            <Modal isOpen={this.state.editModalState} toggle={this.toggleEditModal}>
+              <ModalHeader>Edit a Review</ModalHeader>
+              <ModalBody>
+                <Form>
+                  <div>
+                    <Label>Album</Label>
+                    <Input type="select" onChange={this.makeEditSelection}>
+                      {this.loadOptions()}
+                    </Input>
+                  </div>
+                  <div>
+                    <Label>Rating: {this.state.tempRating}</Label>
+                    <Input type="range" onChange={this.updateTempRating} defaultValue={this.state.tempRating} />
+                  </div>
+                  <div>
+                    <Label>Review</Label>
+                    <Input type="textarea" onChange={this.updateTempReview} defaultValue={this.state.tempReview} />
+                  </div>
+                </Form>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="success" onClick={this.updateReview}>Submit</Button>
+                <Button color="danger" onClick={this.toggleEditModal}>Cancel</Button>
+              </ModalFooter>
+            </Modal>
+      
+            <Table dark>
+              <thead>
+                <tr>
+                  <th />
+                  <th>Artist</th>
+                  <th>Album</th>
+                  <th className="rating">Rating</th>
+                  <th />
+                </tr>
+              </thead>
+              <tbody>
+                {this.parseEntries()}
+              </tbody>
+            </Table>
+      
+            <Modal isOpen={this.state.addModalState} centered size="lg" toggle={this.toggleAddModal}>
+              <ModalHeader>Add a Rating</ModalHeader>
+              <ModalBody>
+                <Form>
+                  <div>
+                    <Label>Artist name</Label>
+                    <Row>
+                      <Col>
+                        <Input type="search" onChange={this.updateTempArtist} />
+                      </Col>
+                      <Col>
+                        <Button onClick={this.getArtistResults}>Submit</Button>
+                      </Col>
+                    </Row>
+                  </div>
+                  <div>
+                    <Label>Album name</Label>
+                    <Input className="loadList" type="select" onChange={this.updateTempAlbum}>
+                      {this.renderInput()}
+                    </Input>
+                  </div>
+                  <div>
+                    <Label>Rating: {this.state.tempRating}</Label>
+                    <Input type="range" onChange={this.updateTempRating} />
+                  </div>
+                  <div>
+                    <Label>Review</Label>
+                    <Input type="textarea" onChange={this.updateTempReview} />
+                  </div>
+                </Form>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="success" onClick={this.addEntry}>Submit</Button>
+                <Button color="danger" onClick={this.toggleAddModal}>Cancel</Button>
+              </ModalFooter>
+            </Modal>
+          </Container>
         );
-    }
+      }      
 }

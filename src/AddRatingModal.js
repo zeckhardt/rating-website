@@ -94,7 +94,7 @@ const AddRatingModal = ({artistSearchResults, setArtistSearchResults,tempArtist,
             albumSpotifyURL: tempSpotifyURL,
             releaseDate: tempDate,
         });
-        this.toggleAddModal();
+        toggleAddModal();
     }
     
     

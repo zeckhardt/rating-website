@@ -1,5 +1,5 @@
 import React from "react";
-import {Table, Button, UncontrolledPopover, PopoverHeader, PopoverBody} from 'reactstrap';
+import {Table, Button, UncontrolledPopover, PopoverHeader, PopoverBody, ButtonGroup} from 'reactstrap';
 
 const RatingTable = ({entries}) => {
 
@@ -23,7 +23,6 @@ const RatingTable = ({entries}) => {
              })
          });
  
- 
          //sort the keys
          let count = 1;
          let keys = Object.keys(dir);
@@ -36,9 +35,6 @@ const RatingTable = ({entries}) => {
                  return new Date(b.releaseDate) - new Date(a.releaseDate);
              });
          });
- 
-         //Don't need to list this
-         keys.splice(keys.indexOf('KAYTRAMINÉ'), 1);
  
          keys.forEach(artist => {
              const avg = (dir[artist].reduce((accumulator, object) => {

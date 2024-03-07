@@ -1,37 +1,46 @@
 /* General Styles */
 
+:root {
+  --main-font: 'Programme';
+  --main-font-src-1: url(https://assets.genius.com/fonts/programme_normal.woff2?1707426152) format('woff2');
+  --main-font-src-2: url(https://assets.genius.com/fonts/programme_normal.woff?1707426152) format('woff');
+  --main-color: #949451;
+  --secondary-color: #212529;
+  --tertiary-color: #306bc9;
+  --white-color: #ffffff;
+  --black-color: #000000;
+}
+
+.font-programme {
+  font-family: var(--main-font);
+  src: var(--main-font-src-1), var(--main-font-src-2);
+  font-style: normal;
+  font-weight: normal;
+}
+
+body, code, h1, th, tr, td.pop-over, button.nav-button, button.btn.btn-secondary, label, h5 {
+  font-family: var(--main-font);
+  src: var(--main-font-src-1), var(--main-font-src-2);
+  font-style: normal;
+  font-weight: normal;
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-code {
-  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-}
-
-/* Heading Styles */
-
 h1 {
   text-align: center;
-  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-  border: 5px solid #949451;
+  border: 5px solid var(--main-color);
   border-radius: 10px;
-  color: #949451;
-  background-color: #35393c;
+  color: var(--main-color);
+  background-color: var(--secondary-color);
 }
 
 h3.popover-header {
-  color: black;
-}
-
-/* Table Styles */
-
-th,
-tr,
-td.pop-over {
-  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  color: var(--black-color);
 }
 
 th {
@@ -43,17 +52,13 @@ tr {
   font-size: large;
 }
 
-/* Button Styles */
-
-button.nav-button,
-button.btn.btn-secondary {
-  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+button.nav-button, button.btn.btn-secondary {
   width: 125px;
   border-radius: 12px;
   padding: 10px 5px;
   margin-bottom: 10px;
-  background-color: #306bc9;
-  color: white;
+  background-color: var(--tertiary-color);
+  color: var(--white-color);
   border: none;
   font-size: large;
 }
@@ -66,8 +71,6 @@ button#edit-rating {
   margin-left: 50px;
 }
 
-/* Navigation Styles */
-
 div#nav-bar {
   display: flex;
   justify-content: center;
@@ -75,53 +78,39 @@ div#nav-bar {
   text-align: center;
 }
 
-/* Root Styles */
-
 #root {
-  background-color: #212529;
+  background-color: var(--secondary-color);
 }
-
-/* Modal Styles */
 
 div.modal-content {
-  background-color: #212529;
+  background-color: var(--secondary-color);
 }
 
-/* Form Styles */
-
-label,
-h5 {
-  color: #949451;
-  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+label, h5 {
+  color: var(--main-color);
 }
 
-input.form-control,
-select.form-select,
-textarea.form-control {
-  background-color: #35393c;
-  border-color: white;
-  color: white;
+input.form-control, select.form-select, textarea.form-control {
+  background-color: var(--secondary-color);
+  border-color: var(--white-color);
+  color: var(--white-color);
 }
 
 h5 {
-  border: 3px solid #949451;
+  border: 3px solid var(--main-color);
   border-radius: 10px;
   padding: 5px;
-  background-color: #35393c;
+  background-color: var(--secondary-color);
 }
 
-/* Popover Styles */
-
 div.popover.show.bs-popover-auto {
-  background-color: #35393c;
-  color: #e0dddd;
+  background-color: var(--secondary-color);
+  color: var(--white-color);
 }
 
 div.popover-body {
-  color: white;
+  color: var(--white-color);
 }
-
-/* Rating Styles */
 
 .rating {
   text-align: center;

@@ -50,34 +50,28 @@ const Home = () => {
 
     /**
      * Makes a post request to the Spotify API to get an access token string used for further API requests.
-     * @returns {Promise<void>}
+     * @returns {Promise<string>}
      */
-    const getAccessToken = () => {
-        const serialize = function(obj) {
-            var str = [];
-            for (var p in obj) {
-                if (obj.hasOwnProperty(p)) {
-                    str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
-                }
-            }
-            return str.join("&");
+    const getAccessToken = async () => {
+        const params = new URLSearchParams({
+            grant_type: 'client_credentials',
+        });
+    
+        try {
+        const response = await axios.post('https://accounts.spotify.com/api/token', params.toString(), {
+            headers: {
+                Authorization: `Basic ${Buffer.from(`${spotifyConfig.clientId}:${spotifyConfig.clientSecret}`).toString('base64')}`,
+            },
+        });
+    
+            const accessToken = response.data.access_token;
+            setAccessToken(accessToken);
+            return accessToken;
+        } catch (error) {
+            console.error(error);
+            throw error;
         }
-      
-        axios.post('https://accounts.spotify.com/api/token',
-                serialize({
-                    grant_type: 'client_credentials'
-                }), {
-                headers: {
-                    'Authorization': 'Basic ' + (new Buffer.from(spotifyConfig.clientId + ':' + spotifyConfig.clientSecret).toString('base64')),
-                }
-            })
-            .then(response => (
-                setAccessToken(response.data.access_token)
-            ))
-            .catch(error => {
-                console.log(error);
-            });
-    }
+    };
 
     /**
      * Retrieves a list of albums for a given artst using the Spotify API.

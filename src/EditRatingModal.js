@@ -40,9 +40,12 @@ const EditRatingModal = ({editModalState, toggleEditModal, tempRating, tempRevie
         update(ref(db, 'musicRatings/' + (editIndex)), {
             albumRating: tempRating,
             albumReview: tempReview,
+        }).then(() => {
+            toggleEditModal();
+        }).catch((error) => {
+            console.error("Error updating review:", error);
         });
-        this.toggleEditModal();
-    }
+    };
     
     return(
         <div id='edit-modal'>

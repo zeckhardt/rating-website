@@ -1,13 +1,15 @@
 import React from 'react';
+import {useState} from "react";
 import secret from './secrets';
-import { Modal, ModalHeader, ModalBody, ModalFooter, Form, Label, Input, Button } from 'reactstrap';
+import {Modal, ModalHeader, ModalBody, ModalFooter, Form, Label, Input, Button, FormGroup} from 'reactstrap';
 
-const LoginModal = ({toggleLoginModal, loginModalState, updatePassState, hiddenState, setHiddenState, inPass}) => {
+const LoginModal = ({toggleLoginModal, loginModalState, hiddenState, setHiddenState}) => {
+    const [password, setPassword] = useState('');
     /**
      * Handles when a user tries to enter a password and evaluates if it is the correct one.
      */
     const loginHandler = () => {
-        if(inPass === secret) {
+        if(password === secret) {
             toggleLoginModal();
             setHiddenState(!hiddenState);
         } 
@@ -19,10 +21,15 @@ const LoginModal = ({toggleLoginModal, loginModalState, updatePassState, hiddenS
                 <ModalHeader>Admin Login</ModalHeader>
                 <ModalBody>
                     <Form>
-                        <div>
-                            <Label>Admin Login</Label>
-                            <Input type="password" placeholder="Password" id="password" onChange={updatePassState} />
-                        </div>
+                        <FormGroup>
+                            <Label for="password">Password</Label>
+                            <Input
+                                type="password"
+                                id="password"
+                                value={password}
+                                onChange={(e) => {setPassword(e.target.value)}}
+                            />
+                        </FormGroup>
                     </Form>
                 </ModalBody>
                 <ModalFooter>

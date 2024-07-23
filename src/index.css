@@ -11,16 +11,16 @@
   --black-color: #000000;
 }
 
-.font-programme {
-  font-family: var(--main-font);
-  src: var(--main-font-src-1), var(--main-font-src-2);
+@font-face {
+  font-family: 'Programme';
+  src: url(https://assets.genius.com/fonts/programme_normal.woff2?1707426152) format('woff2'),
+       url(https://assets.genius.com/fonts/programme_normal.woff?1707426152) format('woff');
   font-style: normal;
   font-weight: normal;
 }
 
 body, code, h1, th, tr, td.pop-over, button.nav-button, button.btn.btn-secondary, label, h5 {
   font-family: var(--main-font);
-  src: var(--main-font-src-1), var(--main-font-src-2);
   font-style: normal;
   font-weight: normal;
 }

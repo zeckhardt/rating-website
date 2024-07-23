@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/rating-website/static/css/main.c84e7fcb.css",
+    "main.css": "/rating-website/static/css/main.ee86a56b.css",
     "main.js": "/rating-website/static/js/main.de9eb038.js",
     "index.html": "/rating-website/index.html",
-    "main.c84e7fcb.css.map": "/rating-website/static/css/main.c84e7fcb.css.map",
+    "main.ee86a56b.css.map": "/rating-website/static/css/main.ee86a56b.css.map",
     "main.de9eb038.js.map": "/rating-website/static/js/main.de9eb038.js.map"
   },
   "entrypoints": [
-    "static/css/main.c84e7fcb.css",
+    "static/css/main.ee86a56b.css",
     "static/js/main.de9eb038.js"
   ]
 }

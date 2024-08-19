@@ -73,7 +73,8 @@ const AddRatingModal = ({artistSearchResults, setArtistSearchResults,tempArtist,
     */
     const addEntry = () => {
         axios.post('https://music-rating-backend.onrender.com/album', {
-            "albumArtURL": tempSpotifyURL,
+            "albumArtURL": tempURL,
+            "albumSpotifyURL": tempSpotifyURL,
             "albumName": tempAlbum,
             "albumRating": tempRating,
             "albumReview": tempReview,

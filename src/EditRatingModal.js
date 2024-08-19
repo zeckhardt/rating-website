@@ -1,5 +1,5 @@
+import axios from "axios";
 import React from "react";
-import { getDatabase, ref, update } from "firebase/database";
 import {Modal, ModalBody, ModalFooter, ModalHeader, Form, Label, Input, Button} from 'reactstrap';
 
 const EditRatingModal = ({editModalState, toggleEditModal, tempRating, tempReview, editIndex, updateTempRating, updateTempReview, originalEntries}) => {
@@ -28,7 +28,7 @@ const EditRatingModal = ({editModalState, toggleEditModal, tempRating, tempRevie
         this.setState({
             tempRating: originalEntries[e.target.selectedIndex].albumRating,
             tempReview: originalEntries[e.target.selectedIndex].albumReview,
-            editIndex: e.target.selectedIndex,
+            editIndex: originalEntries[e.target.selectedIndex].albumName,
         });
     }
 
@@ -36,14 +36,14 @@ const EditRatingModal = ({editModalState, toggleEditModal, tempRating, tempRevie
      * Makes an update request to the database to update the albumRating and albumReview values.
      */
     const updateReview = () => {
-        const db = getDatabase();
-        update(ref(db, 'musicRatings/' + (editIndex)), {
-            albumRating: tempRating,
-            albumReview: tempReview,
-        }).then(() => {
-            toggleEditModal();
-        }).catch((error) => {
-            console.error("Error updating review:", error);
+        axios.put('https://music-rating-backend.onrender.com/album', {
+            "name": editIndex,
+            "rating": tempRating,
+            "review": tempReview
+        }).then(
+            toggleEditModal()
+        ).catch(function (error) {
+            console.log(error);
         });
     };
     

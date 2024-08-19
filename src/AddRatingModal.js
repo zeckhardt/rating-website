@@ -1,6 +1,5 @@
 import React from "react";
 import axios from 'axios';
-import { getDatabase, ref, set } from "firebase/database";
 import {Modal, ModalBody, ModalHeader, Form, Label, Row, Col, Input, Button, ModalFooter} from 'reactstrap';
 
 const AddRatingModal = ({artistSearchResults, setArtistSearchResults,tempArtist, tempRating, tempAlbum, entries, tempReview, tempURL, tempSpotifyURL, tempDate, addModalState, toggleAddModal, accessToken, updateTempAlbum, updateTempArtist, updateTempRating, updateTempReview}) => {
@@ -13,17 +12,11 @@ const AddRatingModal = ({artistSearchResults, setArtistSearchResults,tempArtist,
         let lookup = {};
         let output = [];
 
-        axios.get(`https://api.spotify.com/v1/artists/${artist.data.artists.items[0].id}/albums?limit=30&offset=0`,{
-            headers: {
-                'Authorization': 'Bearer ' + accessToken,
-                'Content-Type': 'application-json'
-            }
-        })
+        axios.get(`https://music-rating-backend.onrender.com/spotify/${artist.data.artists.items[0].id}`)
             .then(function (response) {
-                console.log(response)
                 let albums = [];
-                response.data.items.forEach(entry => {
-                    if(entry.album_type === "album" && !response.data.items.includes(entry.name)) {
+                response.data.forEach(entry => {
+                    if(entry.album_type === "album" && !response.data.includes(entry.name)) {
                         albums.push(entry);
                     }
                 });
@@ -46,12 +39,7 @@ const AddRatingModal = ({artistSearchResults, setArtistSearchResults,tempArtist,
      * Queries the spotify API for user inputed artist name.
      */
     const getArtistResults = () => {
-        axios.get(`https://api.spotify.com/v1/search?q=artist%3A${tempArtist}&type=artist`, {
-            headers: {
-                'Authorization': 'Bearer ' + accessToken,
-                'Content-Type': 'application-json'
-            }
-        })
+        axios.get(`https://music-rating-backend.onrender.com/spotify/artists/${tempArtist}`)
         .then(function (response) {
             searchAlbums(response);
         })
@@ -84,17 +72,18 @@ const AddRatingModal = ({artistSearchResults, setArtistSearchResults,tempArtist,
     * Writes the inputted user review into a new database entry.
     */
     const addEntry = () => {
-        const db = getDatabase();
-        set(ref(db, 'musicRatings/' + (entries.length)), {
-            artistName: tempArtist,
-            albumName: tempAlbum,
-            albumRating: tempRating,
-            albumReview: tempReview,
-            albumArtURL: tempURL,
-            albumSpotifyURL: tempSpotifyURL,
-            releaseDate: tempDate,
+        axios.post('https://music-rating-backend.onrender.com/album', {
+            "albumArtURL": tempSpotifyURL,
+            "albumName": tempAlbum,
+            "albumRating": tempRating,
+            "albumReview": tempReview,
+            "artistName": tempArtist,
+            "releaseDate": tempDate
+          }).then(
+            toggleAddModal()
+          ).catch(function (error) {
+            console.log(error);
         });
-        toggleAddModal();
     }
     
     

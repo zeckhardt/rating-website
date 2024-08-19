@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from "react";
 import axios from 'axios';
-import { getDatabase, ref, onValue, } from "firebase/database";
 import { Buffer } from "buffer";
 import spotifyConfig from "./SpotifyConfig";
 import { Container } from "reactstrap";
@@ -29,23 +28,19 @@ const Home = () => {
     const [entries, setEntries] = useState([]);
     const [accessToken, setAccessToken] = useState('');
     const [artistSearchResults, setArtistSearchResults] = useState([]);
-    const [editIndex, setEditIndex] = useState(null);
+    const [editIndex, setEditIndex] = useState('');
     const [originalEntries, setOriginalEntries] = useState([]);
 
 
     useEffect(() => {
-        const fetchData = async () => {
-            const db = getDatabase();
-            const starCountRef = ref(db, 'musicRatings/');
-            onValue(starCountRef, (snapshot) => {
-                const data = snapshot.val();
+        fetch('https://music-rating-backend.onrender.com/album').then((res) =>
+            res.json().then((data) => {
                 setEntries(data);
                 setOriginalEntries(data);
-            });
-        }
-
-        fetchData();
-        getAccessToken();
+            }
+        )).catch(function (error) {
+            console.log(error);
+        });
     }, []);
 
     /**

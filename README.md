@@ -1,7 +1,6 @@
 # Music Rating App
 
-This is a React application that allows users to rate and review music albums. It utilizes the Spotify API to retrieve album data and Firebase Realtime Database to store and retrieve user reviews. The application features authentication for restricted access, allowing authorized users to add, edit, and delete album reviews.<br>
-[Site Link](https://zach-eckhardt.com)
+This is a React application that allows users to rate and review music albums. It utilizes the Spotify API to retrieve album data and MongoDB to store and retrieve user reviews. All the data is retrieved using the Flask back-end (https://github.com/zeckhardt/music-rating-backend). The application features authentication for restricted access, allowing authorized users to add, edit, and delete album reviews.<br>
 
 ## Funtionality
 ### Add a Rating

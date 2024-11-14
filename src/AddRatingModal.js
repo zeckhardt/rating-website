@@ -2,7 +2,7 @@ import React from "react";
 import axios from 'axios';
 import {Modal, ModalBody, ModalHeader, Form, Label, Row, Col, Input, Button, ModalFooter} from 'reactstrap';
 
-const AddRatingModal = ({artistSearchResults, setArtistSearchResults,tempArtist, tempRating, tempAlbum, entries, tempReview, tempURL, tempSpotifyURL, tempDate, addModalState, toggleAddModal, accessToken, updateTempAlbum, updateTempArtist, updateTempRating, updateTempReview}) => {
+const AddRatingModal = ({artistSearchResults, setArtistSearchResults,tempArtist, tempRating, tempAlbum, tempReview, tempURL, tempSpotifyURL, tempDate, addModalState, toggleAddModal, updateTempAlbum, updateTempArtist, updateTempRating, updateTempReview}) => {
 
     /**
      * Queries the Spotify API for all of a certain artist's albums.
@@ -12,7 +12,7 @@ const AddRatingModal = ({artistSearchResults, setArtistSearchResults,tempArtist,
         let lookup = {};
         let output = [];
 
-        axios.get(`https://music-rating-backend.onrender.com/spotify/${artist.data.artists.items[0].id}`)
+        axios.get(`https://music-rating-backend-production.up.railway.app/spotify/${artist.data.artists.items[0].id}`)
             .then(function (response) {
                 let albums = [];
                 response.data.forEach(entry => {
@@ -39,7 +39,7 @@ const AddRatingModal = ({artistSearchResults, setArtistSearchResults,tempArtist,
      * Queries the spotify API for user inputed artist name.
      */
     const getArtistResults = () => {
-        axios.get(`https://music-rating-backend.onrender.com/spotify/artists/${tempArtist}`)
+        axios.get(`https://music-rating-backend-production.up.railway.app/spotify/artists/${tempArtist}`)
         .then(function (response) {
             searchAlbums(response);
         })
@@ -72,7 +72,7 @@ const AddRatingModal = ({artistSearchResults, setArtistSearchResults,tempArtist,
     * Writes the inputted user review into a new database entry.
     */
     const addEntry = () => {
-        axios.post('https://music-rating-backend.onrender.com/album', {
+        axios.post('https://music-rating-backend-production.up.railway.app/album', {
             "albumArtURL": tempURL,
             "albumSpotifyURL": tempSpotifyURL,
             "albumName": tempAlbum,

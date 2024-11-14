@@ -1,5 +1,5 @@
 import React from "react";
-import {Table, Button, UncontrolledPopover, PopoverHeader, PopoverBody, ButtonGroup} from 'reactstrap';
+import {Table, Button, UncontrolledPopover, PopoverHeader, PopoverBody} from 'reactstrap';
 
 const RatingTable = ({entries}) => {
 
@@ -87,7 +87,7 @@ const RatingTable = ({entries}) => {
   }
 
   return(
-      <Table dark>
+      <Table dark className="table">
         <thead>
         <tr>
           <th/>

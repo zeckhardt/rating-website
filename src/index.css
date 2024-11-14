@@ -1,9 +1,9 @@
 /* General Styles */
 
 :root {
-  --main-font: 'Programme';
-  --main-font-src-1: url(https://assets.genius.com/fonts/programme_normal.woff2?1707426152) format('woff2');
-  --main-font-src-2: url(https://assets.genius.com/fonts/programme_normal.woff?1707426152) format('woff');
+  --main-font: 'Programme', sans-serif;
+  --main-font-src-1: url(https://assets.genius.com/fonts/programme_normal.woff2?1707426152);
+  --main-font-src-2: url(https://assets.genius.com/fonts/programme_normal.woff?1707426152);
   --main-color: #949451;
   --secondary-color: #212529;
   --tertiary-color: #306bc9;
@@ -14,13 +14,13 @@
 @font-face {
   font-family: 'Programme';
   src: url(https://assets.genius.com/fonts/programme_normal.woff2?1707426152) format('woff2'),
-       url(https://assets.genius.com/fonts/programme_normal.woff?1707426152) format('woff');
-  font-style: normal;
+  url(https://assets.genius.com/fonts/programme_normal.woff?1707426152) format('woff');
   font-weight: normal;
+  font-style: normal;
 }
 
 body, code, h1, th, tr, td.pop-over, button.nav-button, button.btn.btn-secondary, label, h5 {
-  font-family: var(--main-font);
+  font-family: var(--main-font), sans-serif;
   font-style: normal;
   font-weight: normal;
 }
@@ -33,10 +33,10 @@ body {
 
 h1 {
   text-align: center;
-  border: 5px solid var(--main-color);
+  border: 5px solid var(--black-color);
   border-radius: 10px;
   color: var(--main-color);
-  background-color: var(--secondary-color);
+  background-color: var(--main-color);
 }
 
 h3.popover-header {
@@ -97,10 +97,10 @@ input.form-control, select.form-select, textarea.form-control {
 }
 
 h5 {
-  border: 3px solid var(--main-color);
+  border: 3px solid var(--black-color);
   border-radius: 10px;
   padding: 5px;
-  background-color: var(--secondary-color);
+  background-color: var(--main-color);
 }
 
 div.popover.show.bs-popover-auto {

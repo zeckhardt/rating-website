@@ -1,7 +1,4 @@
 import React, {useEffect, useState} from "react";
-import axios from 'axios';
-import { Buffer } from "buffer";
-import spotifyConfig from "./SpotifyConfig";
 import { Container } from "reactstrap";
 import AddRatingModal from "./AddRatingModal";
 import RatingTable from "./RatingTable";
@@ -26,14 +23,13 @@ const Home = () => {
     const [tempSpotifyURL, setTempSpotifyURL] = useState('');
     const [tempDate, setTempDate] = useState('');
     const [entries, setEntries] = useState([]);
-    const [accessToken, setAccessToken] = useState('');
     const [artistSearchResults, setArtistSearchResults] = useState([]);
     const [editIndex, setEditIndex] = useState('');
     const [originalEntries, setOriginalEntries] = useState([]);
 
 
     useEffect(() => {
-        fetch('https://music-rating-backend.onrender.com/album').then((res) =>
+        fetch('https://music-rating-backend-production.up.railway.app/album').then((res) =>
             res.json().then((data) => {
                 setEntries(data);
                 setOriginalEntries(data);
@@ -42,51 +38,6 @@ const Home = () => {
             console.log(error);
         });
     }, []);
-
-    /**
-     * Makes a post request to the Spotify API to get an access token string used for further API requests.
-     * @returns {Promise<string>}
-     */
-    const getAccessToken = async () => {
-        const params = new URLSearchParams({
-            grant_type: 'client_credentials',
-        });
-    
-        try {
-        const response = await axios.post('https://accounts.spotify.com/api/token', params.toString(), {
-            headers: {
-                Authorization: `Basic ${Buffer.from(`${spotifyConfig.clientId}:${spotifyConfig.clientSecret}`).toString('base64')}`,
-            },
-        });
-    
-            const accessToken = response.data.access_token;
-            setAccessToken(accessToken);
-            return accessToken;
-        } catch (error) {
-            console.error(error);
-            throw error;
-        }
-    };
-
-    /**
-     * Retrieves a list of albums for a given artst using the Spotify API.
-     * @param {Number} id The numerical representation of the queried artist.
-     * @param {Function} callback Callback function that uses the response data as a parameter.
-     */
-    const getAlbum = (id, callback) => {
-        axios.get(`https://api.spotify.com/v1/albums/${id}`, {
-            headers: {
-                'Authorization': 'Bearer ' + accessToken,
-                'Content-Type': 'application-json'
-            }
-        })
-            .then(function (response)  {
-                callback(response.data);
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
-    }
 
     /**
      * onChange function that updates the tempReview state.
@@ -192,10 +143,8 @@ const Home = () => {
             <LoginModal
                 toggleLoginModal={toggleLoginModal}
                 loginModalState={loginModalState}
-                updatePassState={updatePassState}
                 hiddenState={hiddenState}
                 setHiddenState={setHiddenState}
-                inPass={inPass}
             />
 
             <EditRatingModal
@@ -217,14 +166,12 @@ const Home = () => {
                 tempArtist={tempArtist}
                 tempRating={tempRating}
                 tempAlbum={tempAlbum}
-                entries={entries}
                 tempReview={tempReview}
                 tempURL={tempURL}
                 tempSpotifyURL={tempSpotifyURL}
                 tempDate={tempDate}
                 addModalState={addModalState}
                 toggleAddModal={toggleAddModal}
-                accessToken={accessToken}
                 updateTempAlbum={updateTempAlbum}
                 updateTempArtist={updateTempArtist}
                 updateTempRating={updateTempRating}

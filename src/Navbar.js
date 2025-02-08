@@ -9,9 +9,9 @@ const Navbar = ({ hiddenState, toggleAddModal, toggleLoginModal, toggleEditModal
             <button hidden={!hiddenState} className="nav-button" onClick={toggleLoginModal}>
                 Login
             </button>
-            <button hidden={hiddenState} className="nav-button" onClick={toggleEditModal}>
+            {/* <button hidden={hiddenState} className="nav-button" onClick={toggleEditModal}>
                 Edit Rating
-            </button>
+            </button> */}
         </div>
     );
 };

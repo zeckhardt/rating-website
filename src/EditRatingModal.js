@@ -36,7 +36,7 @@ const EditRatingModal = ({editModalState, toggleEditModal, tempRating, tempRevie
      * Makes an update request to the database to update the albumRating and albumReview values.
      */
     const updateReview = () => {
-        axios.put('https://music-rating-backend-production.up.railway.app/album', {
+        axios.put('https://zeckhardt.pythonanywhere.com/album', {
             "name": editIndex,
             "rating": tempRating,
             "review": tempReview

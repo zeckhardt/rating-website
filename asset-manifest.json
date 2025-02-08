@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/rating-website/static/css/main.8b8f47a6.css",
-    "main.js": "/rating-website/static/js/main.db942527.js",
+    "main.css": "/rating-website/static/css/main.ddf8e5ab.css",
+    "main.js": "/rating-website/static/js/main.08e3cce8.js",
     "index.html": "/rating-website/index.html",
-    "main.8b8f47a6.css.map": "/rating-website/static/css/main.8b8f47a6.css.map",
-    "main.db942527.js.map": "/rating-website/static/js/main.db942527.js.map"
+    "main.ddf8e5ab.css.map": "/rating-website/static/css/main.ddf8e5ab.css.map",
+    "main.08e3cce8.js.map": "/rating-website/static/js/main.08e3cce8.js.map"
   },
   "entrypoints": [
-    "static/css/main.8b8f47a6.css",
-    "static/js/main.db942527.js"
+    "static/css/main.ddf8e5ab.css",
+    "static/js/main.08e3cce8.js"
   ]
 }

@@ -60,7 +60,8 @@ const AddRatingModal = ({artistSearchResults, setArtistSearchResults,tempArtist,
     /**
     * Writes the inputted user review into a new database entry.
     */
-    const addEntry = () => {
+    const addEntry = (e) => {
+        e.preventDefault();
         axios.post('https://zeckhardt.pythonanywhere.com/album', {
             "albumArtURL": tempURL,
             "albumSpotifyURL": tempSpotifyURL,
@@ -112,7 +113,7 @@ const AddRatingModal = ({artistSearchResults, setArtistSearchResults,tempArtist,
                                 <textarea className="form-control" onChange={updateTempReview}></textarea>
                             </div>
                             <div className="modal-footer">
-                                <button className="btn btn-success" onClick={addEntry}>
+                                <button type="button" className="btn btn-success" onClick={addEntry}>
                                     Submit
                                 </button>
                                 <button className="btn btn-danger" onClick={toggleAddModal}>

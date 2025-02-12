@@ -53,7 +53,7 @@ const RatingTable = ({entries}) => {
       dir[artist].sort((a,b) => new Date(b.releaseDate) - new Date(a.releaseDate));
 
       const avg = (
-        dir[artist].reduce((acc, object) => acc + object.albumRating, 0) /
+        dir[artist].reduce((acc, object) => acc + parseFloat(object.albumRating || 0), 0) /
         dir[artist].length
       ).toFixed(1);
 

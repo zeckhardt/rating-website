@@ -107,6 +107,29 @@ const RatingTable = ({ entries }) => {
   }, []);
 
   /**
+   * Counts the number of perfect 10 ratings for an artist
+   * @param {Array} albums - Array of albums for the artist
+   * @returns {number} Number of perfect 10 ratings
+   */
+  const countPerfectRatings = useCallback((albums) => {
+    return albums.filter(album => parseFloat(album.albumRating) === 10).length;
+  }, []);
+
+  /**
+   * Renders stars based on number of perfect 10 ratings
+   * @param {number} count - Number of perfect 10 ratings
+   * @returns {JSX.Element|null} Star elements or null
+   */
+  const renderPerfectStars = useCallback((count) => {
+    if (count === 0) return null;
+    return (
+      <span className="perfect-stars" title={`${count} perfect 10 rating${count !== 1 ? 's' : ''}`}>
+        {' '}{'★'.repeat(count)}
+      </span>
+    );
+  }, []);
+
+  /**
    * Groups albums by artist and calculates averages
    * @returns {Object} Grouped albums with artist averages
    */
@@ -158,6 +181,7 @@ const RatingTable = ({ entries }) => {
       const averageRating = calculateAverageRating(albums);
       const isExpanded = expandedArtists[artist];
       const albumCount = albums.length;
+      const perfectCount = countPerfectRatings(albums);
 
       // Artist header row (clickable to expand/collapse)
       rows.push(
@@ -183,6 +207,7 @@ const RatingTable = ({ entries }) => {
           </th>
           <th className="heads" scope="col">
             {artist}
+            {renderPerfectStars(perfectCount)}
           </th>
           <th scope="col" className="album-count-cell">
             {!isExpanded && (

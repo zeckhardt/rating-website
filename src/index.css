@@ -182,6 +182,24 @@ h3.popover-header {
   }
 }
 
+/* Perfect rating stars next to artist names */
+.perfect-stars {
+  color: #28a745;
+  font-size: 1rem;
+  margin-left: var(--spacing-xs);
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+  animation: perfectStarGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes perfectStarGlow {
+  0% {
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3)) drop-shadow(0 0 4px rgba(40, 167, 69, 0.4));
+  }
+  100% {
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3)) drop-shadow(0 0 8px rgba(40, 167, 69, 0.6));
+  }
+}
+
 /* ===== REVIEW BUTTON STYLES ===== */
 .review-btn {
   background: linear-gradient(135deg, var(--gray-dark) 0%, var(--secondary-color) 100%);

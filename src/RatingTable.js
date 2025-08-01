@@ -94,14 +94,16 @@ const RatingTable = ({ entries }) => {
   }, []);
 
   /**
-   * Gets the appropriate button color class based on rating
-   * @param {number} rating - The album rating
-   * @returns {string} Bootstrap button class
+   * Gets the color class for a rating
+   * @param {string|number} rating - The album rating
+   * @returns {string} CSS class name
    */
   const getRatingColorClass = useCallback((rating) => {
-    if (rating < 5) return 'btn-danger';
-    if (rating < 7) return 'btn-warning';
-    return 'btn-success';
+    const numRating = parseFloat(rating || 0);
+    if (numRating === 10) return 'rating-gold';
+    if (numRating >= 7) return 'rating-green';
+    if (numRating >= 5) return 'rating-yellow';
+    return 'rating-red';
   }, []);
 
   /**
@@ -233,16 +235,22 @@ const RatingTable = ({ entries }) => {
             </td>
             <td className="artist-name">{album.artistName}</td>
             <td className="album-name">{album.albumName}</td>
-            <td className="rating">{album.albumRating}</td>
+            <td className="rating">
+              <span className={`rating-display ${colorClass}`}>
+                <span className="rating-star">★</span>
+                <span className="rating-number">{album.albumRating}</span>
+              </span>
+            </td>
             <td className="review-cell">
               <button 
-                className={`btn ${colorClass} review-btn`}
+                className="btn review-btn"
                 onClick={() => togglePopover(popoverId)}
                 aria-expanded={isPopoverOpen}
                 aria-describedby={isPopoverOpen ? `${popoverId}-content` : undefined}
                 type="button"
                 id={`btn-${popoverId}`}
               >
+                <span className="review-icon"></span>
                 Review
               </button>
             </td>

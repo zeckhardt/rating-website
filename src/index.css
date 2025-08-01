@@ -453,6 +453,82 @@ textarea.form-control::placeholder {
   z-index: -1;
 }
 
+/* ===== COLLAPSIBLE ARTIST ROWS ===== */
+.artist-header.clickable {
+  cursor: pointer;
+  transition: background-color var(--transition-normal);
+  user-select: none;
+}
+
+.artist-header.clickable:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.artist-header.clickable:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: -2px;
+}
+
+.expand-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  color: var(--primary-color);
+  transition: transform var(--transition-normal);
+}
+
+.expand-icon.expanded {
+  transform: rotate(0deg);
+}
+
+.expand-icon.collapsed {
+  transform: rotate(0deg);
+}
+
+.album-count-cell {
+  text-align: left;
+}
+
+.album-count {
+  font-size: 0.85rem;
+  color: var(--white-color);
+  opacity: 0.7;
+  font-weight: 400;
+  font-style: italic;
+}
+
+/* Album rows styling when nested under artist */
+.album-row {
+  background-color: rgba(255, 255, 255, 0.02);
+  border-left: 3px solid var(--primary-color);
+}
+
+.album-row:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Smooth transitions for expand/collapse */
+.artist-header,
+.album-row {
+  transition: all var(--transition-normal);
+}
+
+/* Responsive adjustments for collapsible rows */
+@media (max-width: 768px) {
+  .expand-icon {
+    width: 18px;
+    height: 18px;
+    font-size: 10px;
+  }
+  
+  .album-count {
+    font-size: 0.75rem;
+  }
+}
+
 /* ===== ALBUM ART STYLES ===== */
 .album-art {
   width: 60px;

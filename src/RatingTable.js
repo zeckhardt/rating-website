@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 
 const RatingTable = ({ entries }) => {
   const [popoverOpen, setPopoverOpen] = useState({});
+  const [expandedArtists, setExpandedArtists] = useState({});
   const popoverRef = useRef(null);
 
   /**
@@ -12,6 +13,17 @@ const RatingTable = ({ entries }) => {
     setPopoverOpen((prev) => ({
       ...prev,
       [id]: !prev[id]
+    }));
+  }, []);
+
+  /**
+   * Toggles the expanded state of an artist row
+   * @param {string} artist - The artist name to toggle
+   */
+  const toggleArtistExpansion = useCallback((artist) => {
+    setExpandedArtists((prev) => ({
+      ...prev,
+      [artist]: !prev[artist]
     }));
   }, []);
 
@@ -86,7 +98,7 @@ const RatingTable = ({ entries }) => {
   }, []);
 
   /**
-   * Renders the table rows with grouped artist data
+   * Renders the table rows with collapsible artist groups
    * @returns {JSX.Element[]} Array of table row elements
    */
   const renderTableRows = useMemo(() => {
@@ -97,16 +109,38 @@ const RatingTable = ({ entries }) => {
     sortedArtists.forEach((artist) => {
       const albums = artistGroups[artist];
       const averageRating = calculateAverageRating(albums);
+      const isExpanded = expandedArtists[artist];
+      const albumCount = albums.length;
 
-      // Artist header row
+      // Artist header row (clickable to expand/collapse)
       rows.push(
-        <tr key={`artist-${artist}`} className="artist-header">
+        <tr 
+          key={`artist-${artist}`} 
+          className="artist-header clickable" 
+          onClick={() => toggleArtistExpansion(artist)}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              toggleArtistExpansion(artist);
+            }
+          }}
+          aria-expanded={isExpanded}
+          aria-controls={`artist-albums-${artist}`}
+        >
           <th scope="row" className="text-center">
-            <span className="visually-hidden">Artist</span>
+            <span className={`expand-icon ${isExpanded ? 'expanded' : 'collapsed'}`}>
+              {isExpanded ? '▼' : '▶'}
+            </span>
           </th>
-          <th className="heads" scope="col">{artist}</th>
-          <th scope="col">
-            <span className="visually-hidden">Album</span>
+          <th className="heads" scope="col">
+            {artist}
+          </th>
+          <th scope="col" className="album-count-cell">
+            {!isExpanded && (
+              <span className="album-count">{albumCount} album{albumCount !== 1 ? 's' : ''}</span>
+            )}
           </th>
           <th scope="col" className="text-center">{averageRating}</th>
           <th scope="col">
@@ -115,14 +149,19 @@ const RatingTable = ({ entries }) => {
         </tr>
       );
 
-      // Album rows for this artist
-      albums.forEach((album) => {
-        const colorClass = getRatingColorClass(album.albumRating);
-        const popoverId = `popover-${rowCount}`;
-        const isPopoverOpen = popoverOpen[popoverId];
+      // Album rows for this artist (only show if expanded)
+      if (isExpanded) {
+        albums.forEach((album) => {
+          const colorClass = getRatingColorClass(album.albumRating);
+          const popoverId = `popover-${rowCount}`;
+          const isPopoverOpen = popoverOpen[popoverId];
 
-        rows.push(
-          <tr key={`album-${rowCount}`} className="album-row">
+          rows.push(
+            <tr 
+              key={`album-${rowCount}`} 
+              className="album-row" 
+              id={`artist-albums-${artist}`}
+            >
             <td className="album-art-cell">
               {album.albumSpotifyURL ? (
                 <a 
@@ -163,13 +202,17 @@ const RatingTable = ({ entries }) => {
               </button>
             </td>
           </tr>
-        );
-        rowCount++;
-      });
+          );
+          rowCount++;
+        });
+      } else {
+        // Still increment rowCount for albums even when collapsed to maintain consistent IDs
+        rowCount += albums.length;
+      }
     });
 
     return rows;
-  }, [groupedEntries, calculateAverageRating, getRatingColorClass, popoverOpen, togglePopover]);
+  }, [groupedEntries, calculateAverageRating, getRatingColorClass, popoverOpen, togglePopover, expandedArtists, toggleArtistExpansion]);
 
   /**
    * Renders floating popovers for reviews
@@ -182,12 +225,15 @@ const RatingTable = ({ entries }) => {
 
     sortedArtists.forEach((artist) => {
       const albums = artistGroups[artist];
+      const isExpanded = expandedArtists[artist];
       
-      albums.forEach((album) => {
-        const popoverId = `popover-${rowCount}`;
-        const isPopoverOpen = popoverOpen[popoverId];
-        
-        if (isPopoverOpen) {
+      // Only render popovers for expanded artists
+      if (isExpanded) {
+        albums.forEach((album) => {
+          const popoverId = `popover-${rowCount}`;
+          const isPopoverOpen = popoverOpen[popoverId];
+          
+          if (isPopoverOpen) {
           popovers.push(
             <div 
               key={`floating-${popoverId}`}
@@ -212,13 +258,17 @@ const RatingTable = ({ entries }) => {
               </div>
             </div>
           );
-        }
-        rowCount++;
-      });
+          }
+          rowCount++;
+        });
+      } else {
+        // Still increment rowCount for albums even when collapsed to maintain consistent IDs
+        rowCount += albums.length;
+      }
     });
 
     return popovers;
-  }, [groupedEntries, popoverOpen, togglePopover]);
+  }, [groupedEntries, popoverOpen, togglePopover, expandedArtists]);
 
   if (!entries || entries.length === 0) {
     return (
